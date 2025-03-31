@@ -44,6 +44,7 @@ class MagicValues:
         """convert raw hex string to space separated hex string format 0xXX"""
         return " ".join([hex(ord(v)) for v in vals])
 
+#maybe use another way to access magic value data?
 
 MAGIC_NUMS = {
     "PDF": {
