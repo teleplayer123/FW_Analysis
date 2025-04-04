@@ -13,7 +13,7 @@ def get_base_addr():
 
     buf.write( #need to get hex for opcodes
         b"\x64\x67\xa1\x30\x00\x00\x00",# mov eax, dword ptr fs:[30h]
-        # push eax
+        b"\x50",# push eax
         # mov eax, offset format
         # push eax
         # call printf
