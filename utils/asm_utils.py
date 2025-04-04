@@ -12,7 +12,7 @@ def get_base_addr():
     f = ftype(ctypes.addressof(fpointer))
 
     buf.write( #need to get hex for opcodes
-        # mov eax, dword ptr fs:[30h]
+        b"\x64\x67\xa1\x30\x00\x00\x00",# mov eax, dword ptr fs:[30h]
         # push eax
         # mov eax, offset format
         # push eax
