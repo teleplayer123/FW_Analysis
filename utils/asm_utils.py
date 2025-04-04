@@ -17,12 +17,9 @@ def get_base_addr():
         # mov eax, offset format
         # push eax
         # call printf
-        # pop ebx
-        # pop ebx
-        # ---- Example---
-        # b'\x8b\xc7'  # mov eax, edi
-        # b'\x83\xc0\x01'  # add eax, 1
-        # b'\xc3'  # ret
+        b"\x5b",# pop ebx
+        b"\x5b",# pop ebx
+        #b"\xc3"  # ret
     )
 
     r = f(42)
