@@ -6,7 +6,7 @@ def get_base_addr():
     """Only works on linux"""
     buf = mmap.mmap(-1, mmap.PAGESIZE, prot=mmap.PROT_READ | mmap.PROT_WRITE | mmap.PROT_EXEC)
 
-    ftype = ctypes.CFUNCTYPE(ctypes.c_int32)
+    ftype = ctypes.CFUNCTYPE(ctypes.c_uint32)
     fpointer = ctypes.c_void_p.from_buffer(buf)
 
     f = ftype(ctypes.addressof(fpointer))
