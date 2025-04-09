@@ -24,7 +24,7 @@ def get_base_addr():
     buf.close()
 
 def encode_asm(hexcode):
-    buf = mmap.mmap(-1, len(hexcode), prot=mmap.PROT_READ | mmap.PROT_WRITE | mmap.PROT_EXEC)
+    buf = mmap.mmap(-1, len(hexcode), flags=mmap.MAP_PRIVATE | mmap.MAP_ANONYMOUS,, prot=mmap.PROT_READ | mmap.PROT_WRITE | mmap.PROT_EXEC)
     ftype = ctypes.CFUNCTYPE(ctypes.c_uint32)
     fpointer = ctypes.c_void_p.from_buffer(buf)
     func = ftype(ctypes.addressof(fpointer))
