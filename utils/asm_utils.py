@@ -1,8 +1,6 @@
 import ctypes
 import mmap
 import struct
-import io
-import os
 
 
 def get_base_addr():
