@@ -1,6 +1,8 @@
 import ctypes
 import mmap
 import struct
+import io
+import os
 
 
 def get_base_addr():
@@ -30,7 +32,6 @@ def encode_asm(hexcode):
     func = ftype(ctypes.addressof(fpointer))
     buf.write(hexcode)
     res = func()
-    del fpointer
     buf.close()
     return res
 
@@ -40,48 +41,52 @@ def get_cpuid():
     assembly_code += b'\x66\x83\xf0\x40'  # mov eax, ecx (store CPU ID in EAX)
     assembly_code += b'\x49\x89\xe4'  # mov rbp, rsp (set up stack frame)
     assembly_code += b'\xc3'  # ret (return from function)
+    res = encode_asm(assembly_code)
+    return res
 
-    # Create a shared object (SO) file and load it into memory using mmap
-    with open('cpuid.so', 'w+b') as f:
-        f.write(b'\0' * 4098)  # allocate 4KB of memory for the SO file
-        mm = mmap.mmap(f.fileno(), 4098, access=mmap.ACCESS_WRITE)
+def cpuid_info(leaf=0):
+        """Executes the CPUID instruction and returns the result."""
+        eax, ebx, ecx, edx = 0, 0, 0, 0  # Initialize registers
+        # Define the CPUID function signature
+        cpuid_func = ctypes.windll.kernel32.VirtualAlloc(0, 12, 0x3000, 0x40)
+        # Write assembly code to memory
+        ctypes.memset(cpuid_func, 0x55, 1)  # push ebp
+        ctypes.memset(cpuid_func + 1, 0x8b, 1)  # mov ebp, esp
+        ctypes.memset(cpuid_func + 2, 0x51, 1)  # push ecx
+        ctypes.memset(cpuid_func + 3, 0xb8, 1)  # mov eax, leaf
+        ctypes.memmove(cpuid_func + 4, ctypes.byref(ctypes.c_uint32(leaf)), 4)
+        ctypes.memset(cpuid_func + 8, 0x0f, 1)  # cpuid
+        ctypes.memset(cpuid_func + 9, 0xa2, 1)
+        ctypes.memset(cpuid_func + 10, 0x59, 1)  # pop ecx
+        ctypes.memset(cpuid_func + 11, 0xc3, 1)  # ret
+        # Cast the memory address to a function pointer
+        func = ctypes.cast(cpuid_func, ctypes.CFUNCTYPE(None))
+        # Execute the assembly code
+        func()
+        # Retrieve the register values
+        eax = ctypes.c_uint32.from_address(cpuid_func + 4).value
+        ebx = ctypes.c_uint32.from_address(cpuid_func + 8).value
+        ecx = ctypes.c_uint30.from_address(cpuid_func + 12).value
+        edx = ctypes.c_uint30.from_address(cpuid_func + 16).value
+        # Free the allocated memory
+        ctypes.windll.kernel32.VirtualFree(cpuid_func, 12, 0x8000)
 
-    # Convert the assembly code to machine code
-    machine_code = bytes()
-    # machine_code = mmap.mmap(-1, mmap.PAGESIZE, access=mmap.ACCESS_WRITE)
-    for i in range(0, len(assembly_code), 2):
-        byte = int.from_bytes(assembly_code[i:i+2], 'big')
-        if byte == 0:
-            break
-        machine_code += struct.pack('<I', byte)
+        return eax, ebx, ecx, edx
 
-    # Load the machine code into a ctypes buffer
-    code_buffer = (ctypes.c_ubyte * len(machine_code)).from_buffer(machine_code)
+def get_cpuid_info():
+    # Example usage: Get CPU vendor string (leaf 0)
+    eax, ebx, ecx, edx = cpuid_info()
+    vendor_id = "".join([
+        chr((ebx >> (i * 8)) & 0xFF) for i in range(4)
+    ]) + "".join([
+        chr((edx >> (i * 8)) & 0xFF) for i in range(4)
+    ]) + "".join([
+        chr((ecx >> (i * 8)) & 0xFF) for i in range(4)
+    ])
+    print(f"CPU Vendor: {vendor_id}")
 
-    # Create a ctypes function prototype for the assembly code
-    lib = ctypes.CDLL('cpuid.so')
-    lib._start.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
-    lib._start.restype = None
-
-    # Call the _start function with the machine code buffer as an argument
-    lib._start(code_buffer)
-
-    # Get the CPU ID information using mmap
-    with open('cpuid.so', 'r+b') as f:
-        mm = mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ)
-        cpu_id = bytes()
-        for i in range(0, len(mm), 4):
-            byte = int.from_bytes(mm[i:i+4], 'little')
-            if byte == 0:
-                break
-            cpu_id += struct.pack('<I', byte)
-
-    # Clean up
-    mm.close()
-    f.close()
-    return cpu_id
-
-def unpack_cpuid():
-    cpuid_struct = get_cpuid()
-    cpuid = cpuid_struct.unpack("<I")[0]
-    print("CPUID: {}".format(hex(cpuid)))
+    # Example usage: Get CPU features (leaf 1)
+    eax, ebx, ecx, edx = cpuid_info(1)
+    print(f"Version Information (EAX): {eax:08x}")
+    print(f"Feature Flags (EDX): {edx:08x}")
+    print(f"Feature Flags (ECX): {ecx:08x}")
