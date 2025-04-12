@@ -1,6 +1,7 @@
 import ctypes
 import mmap
-import struct
+import subprocess
+import os
 
 
 def get_base_addr():
@@ -42,3 +43,15 @@ def get_cpuid():
     res = encode_asm(assembly_code)
     return res
 
+def compile_asm(filename):
+    name = filename.split(".")[0]
+    cmd = f"nasm -f elf64 -o {name}.o {filename}"
+    print("Compiling...")
+    res = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding="utf-8")
+    print(res)
+    cmd = f"ld {name}.o -o {name}"
+    res = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding="utf-8")
+    print(res)
+    exe = os.path.join(os.getcwd(), name)
+    return exe
+    
