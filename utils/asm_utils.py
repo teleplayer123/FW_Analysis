@@ -47,11 +47,10 @@ def compile_asm(filename):
     name = filename.split(".")[0]
     cmd = f"nasm -f elf64 -o {name}.o {filename}"
     print("Compiling...")
-    res = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding="utf-8")
+    res = subprocess.run(cmd, shell=True, encoding="utf-8")
     print(res)
     cmd = f"ld {name}.o -o {name}"
-    res = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding="utf-8")
+    res = subprocess.run(cmd, shell=True, encoding="utf-8")
     print(res)
-    exe = os.path.join(os.getcwd(), name)
-    return exe
+    return os.path.join(os.getcwd(), name)
     
