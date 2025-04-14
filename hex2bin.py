@@ -4,6 +4,8 @@ import sys
 
 
 def parse_hex_dump_long(filename):
+    lines = []
+    line_dict = {}
     with open(filename, "r") as fh:
         for line in fh:
             if line == "":
@@ -11,8 +13,7 @@ def parse_hex_dump_long(filename):
             line = line.split("  ", maxsplit=1)[0]
             addr, data = line.split(" ", maxsplit=1)
             data = "".join(data.split(" "))
-            print(data)
-            break
+            
 
 if __name__ == "__main__":
     fname = sys.argv[1]
