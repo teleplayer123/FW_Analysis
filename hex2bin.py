@@ -2,6 +2,7 @@ import sys
 
 
 def parse_hex_dump_long(filename):
+    #TODO: this function is not reliable, need to fix byte order
     data_list = []
     outfile = filename.replace(".log", "_long.bin")
     with open(filename, "r") as fh:
