@@ -4,7 +4,6 @@ import sys
 def parse_hex_dump_long(filename):
     data_list = []
     outfile = filename.replace(".log", "_long.bin")
-
     with open(filename, "r") as fh:
         for line in fh:
             if line == "" or line == "\n":
