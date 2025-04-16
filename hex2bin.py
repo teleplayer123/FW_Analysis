@@ -1,7 +1,7 @@
 import sys
 
 
-def parse_hex_dump_long(filename):
+def __parse_hex_dump_long(filename):
     #TODO: this function is not reliable, need to fix order in which bytes are handled 
     data_list = []
     outfile = filename.replace(".log", "_long.bin")
