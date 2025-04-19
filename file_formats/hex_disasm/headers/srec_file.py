@@ -1,5 +1,5 @@
 import struct
-import ctypes
+import ctypes as ct
 from typing import NamedTuple
 
 
@@ -32,3 +32,20 @@ specific address.
 sum of the values represented by the two hex digit pairs for the byte count,
 address and data fields. See example section for a detailed checksum example.
 """
+
+hex_t = str
+
+class SREC(NamedTuple):
+    rec_start: str  #start record listeral 's'
+    rec_type: int  #record type int 0-9
+    byte_count: hex_t  #one hex byte value 0x03 - 0xff indicates number of bytes in rest of record
+    addr: hex_t  #hex addr size specified hy rec_type in big endian
+    data: hex_t  #sequence of bytes in hex; data size = byte_count - len(addr) - 1
+    checksum: hex_t  #one byte in hex, the least significant byte of ones' complement of the
+                     #sum of the values represented by the two hex digit pairs for the byte count, address and data fields.
+
+class SREC_File:
+
+    def __init__(self, data):
+        self._data = data
+
