@@ -1,12 +1,7 @@
 import ctypes as ct
 import os
 import sys
-import struct
 
-filename = str(sys.argv[1])
-save_dir = os.path.join(os.getcwd(), "UnpackedData")
-if not os.path.exists(save_dir):
-    os.mkdir(save_dir)
 
 class Chunk:
 
@@ -29,7 +24,7 @@ class Unpacker:
         self._data = data
 
     def check_magic(self):
-        """TODO: impllement dictionary with know magic numbers and test for magic number based on file extension"""
+        """TODO: impllement dictionary with known magic numbers and test for magic number based on file extension"""
         pass
 
 def unpack_chunks(chunks):
@@ -42,10 +37,16 @@ def unpack_chunks(chunks):
     finally:
         file.close()
 
-chunks = [Chunk(540, int(707-540), "ucode0"),
+
+
+if __name__ == "__main__":
+    filename = str(sys.argv[1])
+    save_dir = os.path.join(os.getcwd(), "UnpackedData")
+    if not os.path.exists(save_dir):
+        os.mkdir(save_dir)
+    chunks = [Chunk(540, int(707-540), "ucode0"),
           Chunk(707, int(807-707), "esp0"),
           Chunk(807, int(872-807), "esp1"),
           Chunk(1777, int(37517-1777), "Copyright_String"),
           Chunk(37517, int(165488-37517), "x86_64_uCode")]
-
-unpack_chunks(chunks)
+    unpack_chunks(chunks)
