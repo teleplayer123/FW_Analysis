@@ -33,6 +33,13 @@ sum of the values represented by the two hex digit pairs for the byte count,
 address and data fields. See example section for a detailed checksum example.
 """
 
+class RecordField(ct.Structure):
+    _fields_ = [
+        ("S0", ct.c_uint16), #header, address=0000
+        ("S1", ct.c_uint16), #data
+        
+    ]
+
 hex_t = str
 
 class SREC(NamedTuple):
@@ -48,4 +55,5 @@ class SREC_File:
 
     def __init__(self, data):
         self._data = data
+
 
