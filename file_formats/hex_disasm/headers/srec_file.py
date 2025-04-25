@@ -33,15 +33,15 @@ sum of the values represented by the two hex digit pairs for the byte count,
 address and data fields. See example section for a detailed checksum example.
 """
 
-class RecordField(ct.Structure):
+class RecordAddr(ct.Structure):
 
     S0_COMMON = "\x48\x44\x52"
 
     _fields_ = [
-        ("S0", ct.c_uint16), #header, address=0000
-        ("S1", ct.c_uint16), #data starts at 16 bit address, len of data is 'Byte Count' field minus 3 (2 bytes for address, 1 byte for checksum)
-        ("S2", ct.c_uint16), #data starts at 24 bit address, data len is 'Byte Count' field minus 4 (3 bytes for address 1 byte for checksum)
-        
+        ("S0", ct.c_ubyte * 2), #header, address=0000
+        ("S1", ct.c_ubyte * 2), #data starts at 16 bit address, len of data is 'Byte Count' field minus 3 (2 bytes for address, 1 byte for checksum)
+        ("S2", ct.c_ubyte * 3), #data starts at 24 bit address, data len is 'Byte Count' field minus 4 (3 bytes for address 1 byte for checksum)
+        ("S4", ct.c_ubyte * 4),
     ]
 
 hex_t = str
