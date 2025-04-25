@@ -47,7 +47,7 @@ class RecordField(ct.Structure):
 hex_t = str
 
 class SREC(NamedTuple):
-    rec_start: str  #start record listeral 's'
+    rec_start: str  #start record literal 's'
     rec_type: int  #record type int 0-9
     byte_count: hex_t  #one hex byte value 0x03 - 0xff indicates number of bytes in rest of record
     addr: hex_t  #hex addr size specified hy rec_type in big endian
