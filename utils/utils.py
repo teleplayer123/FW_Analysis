@@ -64,3 +64,17 @@ def int_to_hex(i, length=1):
     h = hex(i)[2:]
     h = "0" * (2 * length - len(h)) + h
     return rev_hex(h)
+
+def parse_uboot_dump(filename):
+    outfile = filename.replace(".log", ".bin")
+    new_fh = open(outfile, "w+b")
+    with open(filename, "r") as fh:
+        for line in fh.readlines():
+            line = line.split("  ", maxsplit=1)[0]
+            line = line.split(":", maxsplit=1)
+            if len(line) < 2:
+                continue
+            line = line[1].replace(" ", "")[:32]
+            data = bytes.fromhex(line)
+            new_fh.write(data)
+    new_fh.close()
