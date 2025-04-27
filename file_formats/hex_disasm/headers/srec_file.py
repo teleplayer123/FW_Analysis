@@ -64,7 +64,7 @@ class SREC_File:
                 self._data.append(line.strip())
         self._records = []
 
-    def parse(self):
+    def parse(self) -> list[SREC]:
         """
         Parse the SREC file and store the records.
         """
