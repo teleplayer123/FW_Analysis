@@ -57,7 +57,56 @@ class SREC(NamedTuple):
 
 class SREC_File:
 
-    def __init__(self, data):
-        self._data = data
+    def __init__(self, filename: str):
+        self._data = []
+        with open(filename, "r") as fh:
+            for line in fh:
+                self._data.append(line.strip())
+        self._records = []
 
+    def parse(self):
+        """
+        Parse the SREC file and store the records.
+        """
+        for line in self._data:
+            record = self._parse_record(line.strip())
+            if record:
+                self._records.append(record)
+        return self._records
+    
+    def _parse_record(self, line: str) -> SREC:
+        """
+        Parse a single SREC record line.
 
+        :param line: A single line from the SREC file
+        :return: Parsed record as a dictionary or None if invalid
+        """
+        rec_start = line[0]
+        if rec_start != 'S':
+            return None
+        rec_type = int(line[1])
+        byte_count = int(line[2:4], 16)
+        addr_length = self._get_address_length(rec_type)
+        addr = line[4:4 + addr_length]
+        data_start = 4 + addr_length
+        data_end = data_start + (byte_count - (addr_length // 2) - 1) * 2
+        data = line[data_start:data_end]
+        checksum = line[data_end:]
+
+        return SREC(rec_start, rec_type, byte_count, addr, data, checksum)
+        
+    def _get_address_length(self, rec_type: int) -> int:
+        """
+        Get the address length based on the record type.
+
+        :param rec_type: SREC record type
+        :return: Address length in characters
+        """
+        if rec_type in [1, 9]:
+            return 4  # 2 bytes
+        elif rec_type in [2, 8]:    
+            return 6
+        elif rec_type in [3, 7]:
+            return 8
+        else:
+            return 0
