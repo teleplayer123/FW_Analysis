@@ -1,4 +1,4 @@
-from file_formats import *
+from file_formats.hex_disasm.headers.srec_file import SREC_File
 import sys
 
 srec_file = sys.argv[1]
