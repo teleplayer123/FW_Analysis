@@ -30,7 +30,12 @@ class ShadowEntry:
         pdict = {}
         p_fields = p_str.split("$")
         if len(p_fields) != 3:
-            raise ValueError("Invalid password format")
+            if p_str == "":
+                return {"algo": "", "salt": "", "hash": ""}
+            elif p_str == "*":
+                return {"algo": "locked", "salt": "", "hash": ""}
+            elif p_str in ["!", "!!"]:
+                return {"algo": "disabled", "salt": "", "hash": ""}
         algo_id = p_fields[0]
         if algo_id == "1":
             pdict["algo"] = "md5"
@@ -42,8 +47,6 @@ class ShadowEntry:
             pdict["algo"] = "sha512"
         elif algo_id == "y":
             pdict["algo"] = "yescrypt"
-        elif algo_id == "!":
-            pdict["algo"] = "locked"
         else:
             raise ValueError("Unknown algorithm ID")    
         pdict["salt"] = p_fields[1]

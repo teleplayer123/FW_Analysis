@@ -1,8 +1,11 @@
 from binascii import hexlify, unhexlify
 from Crypto.Cipher import AES
 from Crypto import Random
+from Crypto.Protocol.KDF import scrypt
 from hashlib import sha256
 import base64
+import os
+import hashlib
 
 
 CHAR_FREQ_DICT = {
@@ -256,3 +259,16 @@ def align_data(data, bs=16):
         return data
     pad_size = (bs - (len(data) % bs)) % bs
     return data + bytes(pad_size)
+
+def scrypt_hash(password):
+    salt = os.urandom(16)  # Generate a random 16-byte salt
+    key = hashlib.scrypt(
+        password.encode(), salt=salt, n=2**14, r=8, p=1, maxmem=2**27, dklen=32
+    )  # N=16384, r=8, p=1, dklen=32. Maxmem is optional but recommended.
+    return salt, key.hex()
+
+def verify_scrypt_hash(password, salt, stored_key):
+    key = hashlib.scrypt(
+        password.encode(), salt=salt, n=2**14, r=8, p=1, maxmem=2**27, dklen=32
+    )
+    return key.hex() == stored_key
