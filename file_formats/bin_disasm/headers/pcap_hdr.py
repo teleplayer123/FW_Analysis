@@ -81,7 +81,7 @@ class PCAP:
             raw_header = f.read(PCAPHeader.HDR_SIZE)
             if len(raw_header) < PCAPHeader.HDR_SIZE:
                 raise EOFError("File too short for PCAP header")
-            self.header = PCAPHeader(raw_header)
+            self.header = PCAPHeader(raw_header).phdr
             idx = PacketRecord.PKT_SIZE + PCAPHeader.HDR_SIZE
             while True:
                 raw_record = f.read(idx)
