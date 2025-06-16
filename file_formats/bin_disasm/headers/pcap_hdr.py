@@ -53,7 +53,7 @@ class PCAPHeader:
         return PCAP_HDR(*self.data[:self.HDR_SIZE])
     
     def __str__(self):
-        return f"PCAPHeader(magic_number={self.phdr.magic_number:#0x}, version_major={self.phdr.version_major}, version_minor={self.phdr.version_minor}, thiszone={self.phdr.thiszone}, sigfigs={self.phdr.sigfigs}, snaplen={self.phdr.snaplen}, network={self.phdr.network})"
+        return f"PCAPHeader(magic_number={hex(self.phdr.magic_number)}, version_major={self.phdr.version_major}, version_minor={self.phdr.version_minor}, thiszone={self.phdr.thiszone}, sigfigs={self.phdr.sigfigs}, snaplen={self.phdr.snaplen}, network={self.phdr.network})"
         
 
 
@@ -82,7 +82,6 @@ class PCAP:
             if len(raw_header) < PCAPHeader.HDR_SIZE:
                 raise EOFError("File too short for PCAP header")
             self.header = PCAPHeader(raw_header)
-            self.header.unpack_hdr()
             idx = self.header.HDR_SIZE
             while True:
                 f.seek(idx)
