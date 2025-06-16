@@ -1,20 +1,24 @@
-import ctypes as ct
 import struct
+from dataclasses import dataclass
+from typing import Optional, TypeVar, List
 
 
-class SectionHeaderBlock(ct.Structure):
-    _fields_ = [
-        ("block_type", ct.c_uint32),
-        ("block_total_length", ct.c_uint32),
-        ("byte_order_magic", ct.c_uint32),
-        ("major_version", ct.c_uint16),
-        ("minor_version", ct.c_uint16),
-        ("section_length", ct.c_int64)
-    ]
+_T = TypeVar("_T")
 
-class TypeLength(ct.Structure):
-    _fields_ = [
-        ("block_type", ct.c_uint32),
-        ("block_total_length", ct.c_uint32)
-    ]
+@dataclass
+class TLV:
+    type: int            # uint16
+    length: int          # uint16
+    value: _T
 
+_TLV = TypeVar("_TLV", TLV)
+
+@dataclass
+class SectionHeaderBlock:
+    block_type: int             # uint32
+    block_total_length: int     # uint32
+    byte_order_magic: int       # uint32
+    major_version: int = 1      # uint16
+    minor_version: int = 0      # uint16
+    section_length: int         # int64
+    options: Optional[List[TLV]] = None  # List of TLV objects
