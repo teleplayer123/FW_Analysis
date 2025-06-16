@@ -23,7 +23,7 @@ class PCAP_REC(ct.Structure):
     _fields_ = [
         ("ts_sec", ct.c_uint32),
         ("ts_usec", ct.c_uint32),
-        ("incl_len", ct.c_uint32),
+        ("incl_len", ct.c_uint32), # size of data the imediately follows pcap record
         ("orig_len", ct.c_uint32)
     ]
 
@@ -53,7 +53,7 @@ class PCAPHeader:
         return PCAP_HDR(*self.data[:self.HDR_SIZE])
     
     def __str__(self):
-        return f"PCAPHeader(magic_number={hex(self.phdr.magic_number)}, version_major={self.phdr.version_major}, version_minor={self.phdr.version_minor}, thiszone={self.phdr.thiszone}, sigfigs={self.phdr.sigfigs}, snaplen={self.phdr.snaplen}, network={self.phdr.network})"
+        return f"PCAPHeader(magic_number: {hex(self.phdr.magic_number)}, version_major: {self.phdr.version_major}, version_minor: {self.phdr.version_minor}, thiszone: {self.phdr.thiszone}, sigfigs: {self.phdr.sigfigs}, snaplen: {self.phdr.snaplen}, network: {self.phdr.network})"
         
 
 
@@ -67,6 +67,18 @@ class PacketRecord:
             self.data = self.PKT_STRUCT.unpack(raw_data)
         else:
             self.data = self.PKT_STRUCT.pack(raw_data)
+        self.prec = self.unpack_hdr()
+        self.data_size = self.prec.incl_len
+        self.pkt_data = self.unpack_data(self.data_size)
+    
+    def unpack_hdr(self):
+        return PCAP_REC(*self.data[:self.PKT_SIZE])
+    
+    def unpack_data(self, data_size):
+        return
+
+    def __str__(self):
+        return f"PacketRecord(ts_sec: {self.prec.ts_sec}, ts_usec: {self.prec.ts_usec})"
 
 
 class PCAP:
