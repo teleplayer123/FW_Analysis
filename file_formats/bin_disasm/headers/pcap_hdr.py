@@ -40,20 +40,60 @@ class PCAP_REC_MOD(ct.Structure):
 class PCAPHeader:
     
     HDR_STRUCT = struct.Struct("LHHLLLL")
+    HDR_SIZE = HDR_STRUCT.size
 
     def __init__(self, raw_data, create=False):
         if create == False:
             self.data = self.HDR_STRUCT.unpack(raw_data)
         else:
             self.data = self.HDR_STRUCT.pack(raw_data)
+        self.phdr = self.unpack_hdr()
+
+    def unpack_hdr(self):
+        return PCAP_HDR(*self.data[:self.HDR_SIZE])
+    
+    def __str__(self):
+        return f"PCAPHeader(magic_number={self.phdr.magic_number:#0x}, version_major={self.phdr.version_major}, version_minor={self.phdr.version_minor}, thiszone={self.phdr.thiszone}, sigfigs={self.phdr.sigfigs}, snaplen={self.phdr.snaplen}, network={self.phdr.network})"
+        
 
 
 class PacketRecord:
 
     PKT_STRUCT = struct.Struct("LLLL")
+    PKT_SIZE = PKT_STRUCT.size
 
     def __init__(self, raw_data, create=False):
         if create == False:
             self.data = self.PKT_STRUCT.unpack(raw_data)
         else:
             self.data = self.PKT_STRUCT.pack(raw_data)
+
+
+class PCAP:
+    def __init__(self, fname):
+        self.fname = fname
+        self.header = None
+        self.pcap = {}
+        self.records = {}
+
+    def read(self):
+        with open(self.fname, "rb") as f:
+            raw_header = f.read(PCAPHeader.HDR_SIZE)
+            if len(raw_header) < PCAPHeader.HDR_SIZE:
+                raise EOFError("File too short for PCAP header")
+            self.header = PCAPHeader(raw_header)
+            idx = PacketRecord.PKT_SIZE + PCAPHeader.HDR_SIZE
+            while True:
+                raw_record = f.read(idx)
+                if len(raw_record) < PacketRecord.PKT_SIZE:
+                    if len(raw_record) == 0:
+                        break
+                    break
+                record = PacketRecord(raw_record)
+                self.records[idx] = record
+                idx += PacketRecord.PKT_SIZE
+        self.pcap = {
+            "header": self.header,
+            "records": self.records
+        }
+        return self.pcap
