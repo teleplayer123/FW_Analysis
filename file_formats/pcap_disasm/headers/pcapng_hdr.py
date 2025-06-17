@@ -22,3 +22,16 @@ class SectionHeaderBlock:
     minor_version: int = 0      # uint16
     section_length: int         # int64
     options: Optional[List[TLV]] = None  # List of TLV objects
+    block_total_length_2: int   # uint32
+
+
+class PCAPNG:
+
+    def __init__(self, data: bytes):
+        self.data = data
+        self.offset = 0
+        self.blocks = []
+        self.parse_blocks()
+
+    def parse_blocks(self):
+        pass
