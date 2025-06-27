@@ -19,7 +19,7 @@ class BPReadFlash:
         res = self.serial.read_all()
         res = res.decode('utf-8', errors='ignore')
         print(res)
-        if res.endswith("(Y/n)?"):
+        if res.endswith("(Y/n)> "):
             self.serial.write(b"n\r\n")
             res = self.serial.read_all()
             print(res.decode('utf-8', errors='ignore'))
