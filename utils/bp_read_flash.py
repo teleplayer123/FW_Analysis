@@ -17,10 +17,12 @@ class BPReadFlash:
             print(f"Failed to open serial port {self.port}")
             sys.exit(1)
         res = self.serial.read_all()
-        print(res.decode('utf-8', errors='ignore'))
-        self.serial.write(b"n\r\n")
-        res = self.serial.read_all()
-        print(res.decode('utf-8', errors='ignore'))
+        res = res.decode('utf-8', errors='ignore')
+        print(res)
+        if res.endswith("(Y/n)?"):
+            self.serial.write(b"n\r\n")
+            res = self.serial.read_all()
+            print(res.decode('utf-8', errors='ignore'))
 
     def interactive_mode(self):
         print("Entering interactive mode. Type 'exit' to quit.")
