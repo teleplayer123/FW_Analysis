@@ -32,7 +32,8 @@ class MagicValues:
     MP3 = ("\x49\x44\x33", 0) # mp3 file format with ID3v2 container
     BMP = ("\x42\x4D", 0) # bitmap format mostly used in windows
     ISO = ("\x43\x44\x30\x30\x31", [0x8001, 0x8801, 0x9001]) # ISO9660 CD/DVD image file
-    
+    SHEBANG = ("\x23\x21", 0) # shebang for scripts
+    RPM = ("\xED\xAB\xEE\xDB", 0) # red hat package manager package
 
     @staticmethod
     def x2a(vals):
